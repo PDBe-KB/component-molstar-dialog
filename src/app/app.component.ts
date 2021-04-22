@@ -16,8 +16,12 @@ export class AppComponent {
         {
           pdbId: '2a06',
           assemblyId: 'preferred',
-          entityColor: [50, 130, 255],
-          ligandId: 'JZR'
+          entityColor: [50, 130, 255]
+        },
+        {
+          pdbId: '1cbs',
+          assemblyId: 'preferred',
+          entityColor: [50, 130, 255]
         }
       ],
       current: 0
