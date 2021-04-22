@@ -18,7 +18,6 @@ export class MolstarDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log(this.dialogData);
     this.loadView();
   }
 
@@ -31,6 +30,7 @@ export class MolstarDialogComponent implements OnInit, OnDestroy {
     }
 
     const dialogData = this.dialogData.entryList[this.dialogData.current];
+    // console.log(dialogData);
 
     const initParams = {
       pdbeUrl: appSettings.pdbeUrl,

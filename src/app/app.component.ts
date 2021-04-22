@@ -14,10 +14,10 @@ export class AppComponent {
     this.entryData = {
       entryList: [
         {
-          pdbId: '1cbs',
+          pdbId: '2a06',
           assemblyId: 'preferred',
-          entityId: 1,
-          entityColor: [50, 130, 255]
+          entityColor: [50, 130, 255],
+          ligandId: 'JZR'
         }
       ],
       current: 0
