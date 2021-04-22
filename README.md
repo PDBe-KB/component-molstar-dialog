@@ -1,4 +1,4 @@
-PDBe-KB Tutorial Component
+PDBe-KB MolStar Dialog Component
 =
 
 [![Build Status](https://www.travis-ci.com/PDBe-KB/component-molstar-dialog.svg?branch=main)](https://www.travis-ci.com/PDBe-KB/component-molstar-dialog)
