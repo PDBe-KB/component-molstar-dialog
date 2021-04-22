@@ -6,7 +6,7 @@
   <strong><i class="icon icon-generic" data-icon="i"></i> Select PDB entry from dropdown: </strong>
   <select style="width:auto; font-weight: bold" (change)="updateView($event.target.value)">
     <ng-template ngFor let-entry [ngForOf]="dialogData.entryList" let-i="index">
-      <option [attr.value]="i" [attr.selected]="(i == dialogData.current) ? 'true' : null">{{getlabel(i)}}</option>
+      <option [attr.value]="i" [attr.selected]="(i == dialogData.current) ? 'true' : null">{{getLabel(i)}}</option>
     </ng-template>
   </select>
 </div>

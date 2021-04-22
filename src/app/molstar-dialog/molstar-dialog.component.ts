@@ -24,15 +24,14 @@ export class MolstarDialogComponent implements OnInit, OnDestroy {
   loadView(isUpdate?: boolean) {
     let fullscreen = false;
     let horizontal = true;
-    if(window.screen.width <= 480){
+    if (window.screen.width <= 480) {
       fullscreen = true;
       horizontal = false;
     }
 
     const dialogData = this.dialogData.entryList[this.dialogData.current];
-    // console.log(dialogData);
 
-    const initParams = {
+    let initParams = {
       pdbeUrl: appSettings.pdbeUrl,
       loadMaps: true,
       validationAnnotation: true,
@@ -43,35 +42,12 @@ export class MolstarDialogComponent implements OnInit, OnDestroy {
       subscribeEvents: false
     };
 
-    if(dialogData.superposition) {
-      initParams['moleculeId'] = dialogData.accession,
-      initParams['superposition'] = true;
-      if(dialogData.superpositionParams) initParams['superpositionParams'] = dialogData.superpositionParams;
-    }else{
-      initParams['moleculeId'] = dialogData.pdbId
-    }
+    initParams = this.settingParams(dialogData, initParams);
 
-    if (dialogData.assemblyId) { initParams['assemblyId'] = dialogData.assemblyId.toString(); }
-
-    if (dialogData.ligandId) {
-      initParams['ligandView'] = { 'label_comp_id': dialogData.ligandId };
-      initParams['selectInteraction'] = false;
-      initParams.validationAnnotation = false;
-      initParams.domainAnnotation = false;
-    }
-
-    if(isUpdate){
-      let updateParams = {};
-      if(initParams['moleculeId']) updateParams['moleculeId'] = initParams['moleculeId'];
-      if(initParams['assemblyId']) updateParams['assemblyId'] = initParams['assemblyId'];
-      if(initParams['ligandView']){
-        updateParams['ligandView'] = initParams['ligandView'];
-        updateParams['selectInteraction'] = false;
-        updateParams['validationAnnotation'] = false;
-        updateParams['domainAnnotation'] = false;
-      }
+    if (isUpdate) {
+      const updateParams = this.getUpdateParams(initParams);
       this.pdbeMolstar.visual.update(updateParams, true);
-    }else{
+    } else {
 
       const ele = (<HTMLInputElement>document.getElementById('app'));
       if (ele) {
@@ -79,52 +55,99 @@ export class MolstarDialogComponent implements OnInit, OnDestroy {
         this.pdbeMolstar.render(ele, initParams);
       }
     }
-    
+
     // set best chain color
     if (dialogData.chainId && dialogData.chainColor) {
       const _this = this;
       this.pdbeMolstar.events.loadComplete.subscribe(function (e) {
         var colorparam = dialogData.chainColor;
-        var chainColor = {r:colorparam[0], g:colorparam[1], b:colorparam[2]};
-        var defaultChainColor = {r:231, g:200, b:200};
-        if(typeof _this.pdbeMolstar.visual.select !== 'undefined'){
-          _this.pdbeMolstar.visual.select({ data: [{struct_asym_id: dialogData.chainId, color: chainColor }], nonSelectedColor: defaultChainColor  });
+        var chainColor = {r: colorparam[0], g: colorparam[1], b: colorparam[2]};
+        var defaultChainColor = {r: 231, g: 200, b: 200};
+        if (typeof _this.pdbeMolstar.visual.select !== 'undefined') {
+          _this.pdbeMolstar.visual.select({
+            data: [{struct_asym_id: dialogData.chainId, color: chainColor}],
+            nonSelectedColor: defaultChainColor
+          });
         }
       });
     } else if (dialogData.entityId && dialogData.entityColor && !dialogData.ligandId) {
       const _this = this;
       this.pdbeMolstar.events.loadComplete.subscribe(function (e) {
         var colorparam = dialogData.entityColor;
-        var chainColor = {r:colorparam[0], g:colorparam[1], b:colorparam[2]};
-        var defaultChainColor = {r:231, g:200, b:200};
-        if(typeof _this.pdbeMolstar.visual.select !== 'undefined'){
-          _this.pdbeMolstar.visual.select({ data: [{entity_id: dialogData.entityId, color: chainColor }], nonSelectedColor: defaultChainColor });
+        var chainColor = {r: colorparam[0], g: colorparam[1], b: colorparam[2]};
+        var defaultChainColor = {r: 231, g: 200, b: 200};
+        if (typeof _this.pdbeMolstar.visual.select !== 'undefined') {
+          _this.pdbeMolstar.visual.select({
+            data: [{entity_id: dialogData.entityId, color: chainColor}],
+            nonSelectedColor: defaultChainColor
+          });
         }
       });
     }
 
   }
 
-  updateView(updatedIndex){
+  settingParams(dialogData, initParams): any {
+    if (dialogData.superposition) {
+      initParams.moleculeId = dialogData.accession;
+      initParams.superposition = true;
+      if (dialogData.superpositionParams){
+        initParams.superpositionParams = dialogData.superpositionParams;
+      }
+    } else {
+      initParams.moleculeId = dialogData.pdbId;
+    }
+
+    if (dialogData.assemblyId) {
+      initParams.assemblyId = dialogData.assemblyId.toString();
+    }
+
+    if (dialogData.ligandId) {
+      initParams.ligandView = {label_comp_id: dialogData.ligandId};
+      initParams.selectInteraction = false;
+      initParams.validationAnnotation = false;
+      initParams.domainAnnotation = false;
+    }
+    return initParams;
+  }
+
+  getUpdateParams(initParams): any {
+    const updateParams = {};
+    if (initParams.moleculeId) { updateParams['moleculeId'] = initParams.moleculeId; }
+    if (initParams.assemblyId) { updateParams['assemblyId'] = initParams.assemblyId; }
+    if (initParams.ligandView) {
+      updateParams['ligandView'] = initParams.ligandView;
+      updateParams['selectInteraction'] = false;
+      updateParams['validationAnnotation'] = false;
+      updateParams['domainAnnotation'] = false;
+    }
+    return updateParams;
+  }
+
+  updateView(updatedIndex): void {
     this.dialogData.current = updatedIndex;
     this.loadView(true);
   }
 
-  getlabel(index){
+  getLabel(index): string {
     const entryData = this.dialogData.entryList[index];
     let name = 'PDB ' + entryData.pdbId;
-    if (entryData.chainId) { name += ' chain ' + entryData.chainId; }
-    if (entryData.assemblyId && entryData.assemblyId != 'preferred') { name += ' assembly ' + entryData.assemblyId; }
+    if (entryData.chainId) {
+      name += ' chain ' + entryData.chainId;
+    }
+    if (entryData.assemblyId && entryData.assemblyId != 'preferred') {
+      name += ' assembly ' + entryData.assemblyId;
+    }
     return name;
   }
 
-  closeDialog() {
+  closeDialog(): void {
     this.dialogRef.close('Close');
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     // Destroy molstar instance
-    if(typeof this.pdbeMolstar.plugin !== 'undefined'){
+    if (this.pdbeMolstar && typeof this.pdbeMolstar.plugin !== 'undefined') {
       this.pdbeMolstar.plugin.clear();
     }
   }
